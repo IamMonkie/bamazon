@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+
+#instructions folder
+/Instructions
+
+#Mac Files
+.DS_Store
