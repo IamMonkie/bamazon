@@ -33,6 +33,9 @@ connection.connect(function(err) {
 // ----------------------------------------------------------------------------------------------------
 
 function mainLoop() {
+  // ----------------------------------------------------------------------------------------------------
+  //Inquirer prompt
+  // ----------------------------------------------------------------------------------------------------
   inquirer
     .prompt([
       {
@@ -58,44 +61,44 @@ function mainLoop() {
       }
     ])
     .then(function(userPurchase) {
-      connection.query("SELECT * FROM products WHERE item_id=?", function(
-        err,
-        response
-      ) {
-        let product = parseInt(userPurchase.product_id) - 1;
-        let howMany = parseInt(userPurchase.quantity);
+      let product = parseInt(userPurchase.product_id) - 1;
+      let howMany = parseInt(userPurchase.quantity);
+      let totalPrice = parseFloat(userPurchase.price * howMany);
 
-        let totalPrice = parseFloat(response[purchase].price * howMany);
+      connection.query(
+        "SELECT * FROM products WHERE item_id=?",
+        [userPurchase.product_id],
+        function(err, response) {
+          console.log("response: " + product + "\n" + "quantity: " + howMany);
+          console.log("Total Price: " + totalPrice);
 
-        console.log("response: " + product + "\n" + "quantity: " + howMany);
-        console.log("Total Price: " + totalPrice);
-
-        // ----------------------------------------------------------------------------------------------------
-        //verify available stock
-        // ----------------------------------------------------------------------------------------------------
-
-        if (response[purchase].stock_quantity >= howMany) {
-          //update stock
-          connection.query(
-            "UPDATE products SET ? WHERE ?",
-            [
-              {
-                stock_quantity: response[product].stock_quantity - howMany
-              },
-              {
-                item_id: response.id
-              }
-            ],
-            function(err, result) {
-              if (err) throw err;
-              console.log("Success! Your purchase total is $" + totalPrice);
-            }
-          );
+          // ----------------------------------------------------------------------------------------------------
+          //verify available stock
           // ----------------------------------------------------------------------------------------------------
 
-          // continueShopping();
+          if (userPurchase.stock_quantity >= howMany) {
+            //update stock
+            connection.query(
+              "UPDATE products SET ? WHERE ?",
+              [
+                {
+                  stock_quantity: userPurchase[product].stock_quantity - howMany
+                },
+                {
+                  item_id: response.id
+                }
+              ],
+              function(err, result) {
+                if (err) throw err;
+                console.log("Success! Your purchase total is $" + totalPrice);
+              }
+            );
+            // ----------------------------------------------------------------------------------------------------
+
+            // continueShopping();
+          }
         }
-      });
+      );
     });
 }
 
