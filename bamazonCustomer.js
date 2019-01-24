@@ -1,6 +1,11 @@
+//Variables
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 const Table = require("cli-table");
+
+// ----------------------------------------------------------------------------------------------------
+//Establish Connection
+// ----------------------------------------------------------------------------------------------------
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -14,6 +19,9 @@ connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
   console.log("");
+  // ----------------------------------------------------------------------------------------------------
+  //Application Start
+  // ----------------------------------------------------------------------------------------------------
 
   //Welcome Message
   console.log("  ------------ Welcome to Bamazon ------------");
@@ -22,6 +30,8 @@ connection.connect(function(err) {
 
 // ----------------------------------------------------------------------------------------------------
 //Prompt user to make selection
+// ----------------------------------------------------------------------------------------------------
+
 function mainLoop() {
   inquirer
     .prompt([
@@ -37,8 +47,10 @@ function mainLoop() {
           return false;
         }
       },
+      // ----------------------------------------------------------------------------------------------------
+      //Inquirer prompt
+      // ----------------------------------------------------------------------------------------------------
 
-      //Prompt user to enter desired quantity
       {
         type: "input",
         name: "quantity",
@@ -57,7 +69,10 @@ function mainLoop() {
 
         console.log("response: " + product + "\n" + "quantity: " + howMany);
         console.log("Total Price: " + totalPrice);
+
+        // ----------------------------------------------------------------------------------------------------
         //verify available stock
+        // ----------------------------------------------------------------------------------------------------
 
         if (response[purchase].stock_quantity >= howMany) {
           //update stock
@@ -76,6 +91,7 @@ function mainLoop() {
               console.log("Success! Your purchase total is $" + totalPrice);
             }
           );
+          // ----------------------------------------------------------------------------------------------------
 
           // continueShopping();
         }
@@ -84,6 +100,9 @@ function mainLoop() {
 }
 
 // ----------------------------------------------------------------------------------------------------
+// Functions
+// ----------------------------------------------------------------------------------------------------
+
 function showTable() {
   let table = new Table({
     chars: {
