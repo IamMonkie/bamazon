@@ -63,40 +63,57 @@ function mainLoop() {
     .then(function(userPurchase) {
       let product = parseInt(userPurchase.product_id) - 1;
       let howMany = parseInt(userPurchase.quantity);
-      let totalPrice = parseFloat(userPurchase.price * howMany);
+      //let totalPrice = parseFloat(userPurchase.price) * howMany;
 
       connection.query(
         "SELECT * FROM products WHERE item_id=?",
-        [userPurchase.product_id],
+        userPurchase.product_id,
         function(err, response) {
-          console.log("response: " + product + "\n" + "quantity: " + howMany);
-          console.log("Total Price: " + totalPrice);
+          let totalPrice = parseFloat(response.price) * howMany;
+
+          console.log("product: " + product + "\n" + "quantity: " + howMany);
+          console.log("response: " + response);
+          //console.log("Total Price: " + response.totalPrice);
+          console.log("");
 
           // ----------------------------------------------------------------------------------------------------
           //verify available stock
           // ----------------------------------------------------------------------------------------------------
+          for (let i = 0; i <= response.length; i++) {
+            if (howMany > response[i].stock_quantity) {
+              console.log("stock quantity: " + response[i].stock_quantity);
+              console.log(
+                "Oh Noes! Not enough in stock. Please check back later"
+              );
+              console.log("");
+              showTable();
+            } else {
+              console.log("stock quantity: " + response[i].stock_quantity);
+              console.log("We has those");
 
-          if (userPurchase.stock_quantity >= howMany) {
-            //update stock
-            connection.query(
-              "UPDATE products SET ? WHERE ?",
-              [
-                {
-                  stock_quantity: userPurchase[product].stock_quantity - howMany
-                },
-                {
-                  item_id: response.id
+              //update stock
+
+              connection.query(
+                "UPDATE products SET ? WHERE ?",
+                [
+                  {
+                    stock_quantity: response[i].stock_quantity - howMany
+                  },
+                  {
+                    item_id: response.id
+                  }
+                ],
+
+                function(err, result) {
+                  if (err) throw err;
+                  console.log("Success! Your purchase total is $" + totalPrice);
                 }
-              ],
-              function(err, result) {
-                if (err) throw err;
-                console.log("Success! Your purchase total is $" + totalPrice);
-              }
-            );
-            // ----------------------------------------------------------------------------------------------------
+              );
+              // ----------------------------------------------------------------------------------------------------
 
-            // continueShopping();
-          }
+              // continueShopping();
+            }
+          } //inventory loop close
         }
       );
     });
