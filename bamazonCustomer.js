@@ -63,6 +63,7 @@ function mainLoop() {
     .then(function(userPurchase) {
       let product = parseInt(userPurchase.product_id) - 1;
       let howMany = parseInt(userPurchase.quantity);
+
       //let totalPrice = parseFloat(userPurchase.price) * howMany;
 
       connection.query(
@@ -71,8 +72,8 @@ function mainLoop() {
         function(err, response) {
           let totalPrice = parseFloat(response.price) * howMany;
 
-          console.log("product: " + product + "\n" + "quantity: " + howMany);
-          console.log(response);
+          //console.log("product: " + product + "\n" + "quantity: " + howMany);
+          //console.log(response);
           //console.log("Total Price: " + response.totalPrice);
           console.log("");
 
@@ -86,19 +87,18 @@ function mainLoop() {
                 "Oh Noes! Not enough in stock. Please check back later"
               );
               continuePrompt();
-              console.log("");
-              showTable();
+              2;
             } else {
               console.log("stock quantity: " + response[i].stock_quantity);
               console.log("We has those");
 
               //update stock
-
+              let stockUpdate = response[i].stock_quantity - howMany;
               connection.query(
                 "UPDATE products SET ? WHERE ?",
                 [
                   {
-                    stock_quantity: response[i].stock_quantity - howMany
+                    stock_quantity: stockUpdate
                   },
                   {
                     item_id: response.id
