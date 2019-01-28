@@ -72,19 +72,20 @@ function mainLoop() {
           let totalPrice = parseFloat(response.price) * howMany;
 
           console.log("product: " + product + "\n" + "quantity: " + howMany);
-          console.log("response: " + response);
+          console.log(response);
           //console.log("Total Price: " + response.totalPrice);
           console.log("");
 
           // ----------------------------------------------------------------------------------------------------
           //verify available stock
           // ----------------------------------------------------------------------------------------------------
-          for (let i = 0; i <= response.length; i++) {
+          for (let i = 0; i < response.length; i++) {
             if (howMany > response[i].stock_quantity) {
               console.log("stock quantity: " + response[i].stock_quantity);
               console.log(
                 "Oh Noes! Not enough in stock. Please check back later"
               );
+              continuePrompt();
               console.log("");
               showTable();
             } else {
@@ -107,6 +108,7 @@ function mainLoop() {
                 function(err, result) {
                   if (err) throw err;
                   console.log("Success! Your purchase total is $" + totalPrice);
+                  continuePrompt();
                 }
               );
               // ----------------------------------------------------------------------------------------------------
@@ -174,4 +176,22 @@ function showTable() {
 }
 
 // ----------------------------------------------------------------------------------------------------
-// function continuePrompt() {}
+function continuePrompt() {
+  inquirer
+    .prompt([
+      {
+        type: "confirm",
+        name: "continue",
+        message: "Would you like to continue shopping?",
+        default: true
+      }
+    ])
+    .then(function(user) {
+      if (user.continue === true) {
+        showTable();
+      } else {
+        console.log("Thank you for shopping at Bamazon");
+        process.exit(1);
+      }
+    });
+}
